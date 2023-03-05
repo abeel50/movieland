@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import SearchIcon from "./search.svg";
 import MovieCard from "./movieCard";
 import './App.css';
+import Spinner from "./common/Spinner";
+
 
 const API_URL = "http://www.omdbapi.com/?i=tt3896198&apikey=82498b92";
 
@@ -9,11 +11,15 @@ function App() {
 
   const [movies, setMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [saving, setSaving] = useState(false);
+
 
   const searchMovies = async (title) => {
+    setSaving(true);
     const response = await fetch(`${API_URL}&s=${title}`);
     const data = await response.json();
     setMovies(data.Search);
+    setSaving(false);
   }
 
   useEffect(() => {
@@ -30,21 +36,26 @@ function App() {
         <img src={SearchIcon} alt="search"
           onClick={() => searchMovies(searchTerm)} />
       </div>
+      {saving ? (<Spinner />) : (
 
-      {movies?.length > 0
-        ? (
-          <div className="container">
-            {movies.map((movie) => (
-              <MovieCard movie={movie} />
-            ))}
-          </div>
-        ) : (
-          <div className="empty">
-            <h2>No movies found</h2>
+        <>
+          {movies?.length > 0
+            ? (
+              <div className="container">
+                {movies.map((movie) => (
+                  <MovieCard movie={movie} />
+                ))}
+              </div>
+            ) : (
+              <div className="empty">
+                <h2>No movies found</h2>
 
-          </div>
-        )}
+              </div>
+            )}
+        </>
 
+      )
+      }
     </div>
   );
 }
